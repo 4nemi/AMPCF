@@ -89,6 +89,12 @@ class DataFetcher:
 
         # user_idをふり直す
         ratings["user_id"] = ratings.groupby("user_id").ngroup()
+        # movie_idをふり直す
+        ratings["old_movie_id"] = ratings["movie_id"]
+        ratings["movie_id"] = ratings.groupby("movie_id").ngroup()
+
+        movie_id_map = dict(zip(ratings["old_movie_id"], ratings["movie_id"]))
+        movies["movie_id"] = movies["movie_id"].map(movie_id_map)
 
         # 必要なカラムのみを抽出
         # positive_pairs = ratings[["user_id", "movie_id", "timestamp"]]

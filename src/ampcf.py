@@ -38,7 +38,7 @@ class AMPCF(nn.Module):
             attention_scores[:, k] = F.cosine_similarity(psi_ik, phi_j, dim=1)
 
         # Normalize attention scores
-        attention_scores = F.softmax(attention_scores, dim=1)
+        attention_scores = F.softmax(attention_scores, dim=1).to(user_embedding.device)
 
         # Compute attentive user-item vector
         x_ij = torch.sum(attention_scores.unsqueeze(-1) * user_embedding, dim=1)  # Shape: (batch_size, embedding_dim)

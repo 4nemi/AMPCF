@@ -7,7 +7,7 @@ from datafetcher import DataFetcher
 from ampcf import AMPCF
 
 
-class Config:
+class Cfg:
     num_users: int
     num_items: int
     num_personas: int = 4
@@ -32,32 +32,32 @@ def train():
         datacontainer.train, batch_size=256, shuffle=True, num_workers=4, pin_memory=True, drop_last=True
     )
 
-    Config.num_users = len(np.unique(datacontainer.train.user_ids))
-    Config.num_items = len(np.unique(datacontainer.train.item_ids))
+    Cfg.num_users = len(np.unique(datacontainer.train.user_ids))
+    Cfg.num_items = datacontainer.item_content.movie_id.nunique()
 
     model = AMPCF(
-        Config.num_users,
-        Config.num_items,
-        Config.num_personas,
-        Config.embedding_dim,
-        Config.attention_dim,
+        Cfg.num_users,
+        Cfg.num_items,
+        Cfg.num_personas,
+        Cfg.embedding_dim,
+        Cfg.attention_dim,
     )
 
     model.to(device)
 
     model.train()
-    optimizer = Adam(model.parameters(), lr=Config.lr)
+    optimizer = Adam(model.parameters(), lr=Cfg.lr)
 
     best_score = 2**10
 
-    for epoch in range(Config.epochs):
+    for epoch in range(Cfg.epochs):
         for step, (user_ids, item_ids) in enumerate(train_loader):
             user_ids = user_ids.to(device)
             item_ids = item_ids.to(device)
 
             optimizer.zero_grad()
 
-            loss = model.cal_loss(user_ids, item_ids, 4, Config.lambda_p, Config.lambda_n, Config.alpha)
+            loss = model.cal_loss(user_ids, item_ids, 4, Cfg.lambda_p, Cfg.lambda_n, Cfg.alpha)
 
             loss.backward()
             optimizer.step()
